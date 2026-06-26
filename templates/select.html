@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Select Disease{% endblock %}
+
+{% block content %}
+<section class="select-page">
+    <h1>Which prediction would you like to run?</h1>
+    <div class="disease-cards">
+        <a href="{{ url_for('predict_page', disease='heart') }}" class="disease-card">
+            <div class="disease-icon">🫀</div>
+            <h2>Heart Disease</h2>
+            <p>Predicts likelihood based on 13 clinical features such as blood pressure, cholesterol, and ECG data.</p>
+            <span class="disease-link">Predict Heart Disease →</span>
+        </a>
+        <a href="{{ url_for('predict_page', disease='diabetes') }}" class="disease-card">
+            <div class="disease-icon">🩸</div>
+            <h2>Diabetes</h2>
+            <p>Predicts likelihood based on 8 clinical features such as glucose level, BMI, and insulin.</p>
+            <span class="disease-link">Predict Diabetes →</span>
+        </a>
+    </div>
+</section>
+{% endblock %}

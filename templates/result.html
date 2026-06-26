@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}Prediction Result — {{ result.patient_name }}{% endblock %}
+
+{% block content %}
+<section class="result-page">
+    <div class="report-header">
+        <h1>📋 Prediction Report</h1>
+        <p class="hero-sub">{{ result.disease_label }} Risk Assessment</p>
+    </div>
+
+    <div class="report card">
+
+        <!-- Patient Information -->
+        <div class="report-section">
+            <h3 class="form-section-title">Patient Information</h3>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Name</span>
+                    <span class="info-value">{{ result.patient_name }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Age</span>
+                    <span class="info-value">{{ result.record.get('age')|int }} years</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Gender</span>
+                    <span class="info-value">
+                        {% if 'sex' in result.record %}
+                            {{ 'Male' if result.record['sex']|int == 1 else 'Female' }}
+                        {% else %}
+                            N/A
+                        {% endif %}
+                    </span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Disease Screened</span>
+                    <span class="info-value">{{ result.disease_label }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Result banner -->
+        <div class="report-section">
+            <h3 class="form-section-title">Prediction Result</h3>
+            <div class="result-banner {{ 'risk-high' if result.risk_label == 'High Risk' else ('risk-medium' if result.risk_label == 'Medium Risk' else 'risk-low') }}">
+                <div class="verdict">{{ result.verdict }}</div>
+                <div class="risk-badge">{{ result.risk_label }}</div>
+            </div>
+
+            <div class="result-detail-grid">
+                <div class="gauge-wrap">
+                    <canvas id="riskGauge" width="220" height="220"></canvas>
+                    <div class="gauge-value">{{ result.proba }}%</div>
+                </div>
+                <div class="result-meta">
+                    <p class="gauge-caption">Probability of {{ result.disease_label.lower() }} (from predict_proba)</p>
+                    <p class="model-used">Model used: <strong>{{ result.model_used }}</strong></p>
+                    <p class="model-used">Date &amp; Time: <strong>{{ result.timestamp[:19].replace('T', ' ') }}</strong></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contributing factors -->
+        <div class="report-section">
+            <h3 class="form-section-title">Top Contributing Factors</h3>
+            <canvas id="factorsChart" height="180"></canvas>
+        </div>
+
+        <!-- Explanation -->
+        <div class="report-section">
+            <h3 class="form-section-title">Explanation</h3>
+            <p class="explanation">{{ result.explanation|replace("**","")|safe }}</p>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="report-actions">
+            <form method="POST" action="{{ url_for('download_report', disease=disease) }}" class="inline-form">
+                <input type="hidden" name="patient_name" value="{{ result.patient_name }}">
+                {% for field in feature_order %}
+                <input type="hidden" name="{{ field }}" value="{{ result.record[field] }}">
+                {% endfor %}
+                <button type="submit" class="btn-primary">⬇ Download PDF</button>
+            </form>
+            <a href="{{ url_for('history_page') }}" class="btn-secondary">📜 View History</a>
+            <a href="{{ url_for('predict_page', disease=disease) }}" class="btn-secondary">🔄 New Prediction</a>
+            <a href="{{ url_for('landing') }}" class="btn-secondary">🏠 Home</a>
+        </div>
+    </div>
+</section>
+
+<script>
+    const riskProba = {{ result.proba }};
+    const riskLabel = "{{ result.risk_label }}";
+    const factorLabels = {{ result.top_factors | map(attribute='friendly_name') | list | tojson }};
+    const factorScores = {{ result.top_factors | map(attribute='contribution_score') | list | tojson }};
+</script>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/predict.js') }}"></script>
+<script>
+// Expose prediction context so the AI Health Assistant can use it
+window.__AI_PREDICTION_CONTEXT__ = {
+    disease_label: {{ result.disease_label | tojson }},
+    risk_label: {{ result.risk_label | tojson }},
+    proba: {{ result.proba }},
+    verdict: {{ result.verdict | tojson }}
+};
+// Auto-open the chat if the user arrives on the result page
+document.addEventListener('DOMContentLoaded', function() {
+    var win = document.getElementById('ai-chat-window');
+    if (win) {
+        setTimeout(function() { win.classList.add('open'); }, 800);
+    }
+});
+</script>
+{% endblock %}

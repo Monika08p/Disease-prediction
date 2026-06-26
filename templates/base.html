@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}Disease Prediction System{% endblock %}</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+</head>
+<body>
+<nav class="navbar">
+    <a href="{{ url_for('landing') }}" class="brand">🩺 Disease<span>Predict</span></a>
+    <div class="nav-links">
+        <a href="{{ url_for('landing') }}">Home</a>
+        <a href="{{ url_for('select_disease') }}">Predict</a>
+        <a href="{{ url_for('history_page') }}">History</a>
+        {% if session.get('user_name') %}
+        <span class="nav-user">👤 {{ session['user_name'].split()[0] }}</span>
+        <a href="{{ url_for('auth.logout') }}" class="btn-logout">Logout</a>
+        {% endif %}
+        <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">🌙</button>
+    </div>
+</nav>
+
+<main class="container">
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="footer">
+    <p>Disease Prediction System &copy; 2026 — Educational ML project. Not a certified medical diagnostic tool.</p>
+</footer>
+
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% block scripts %}{% endblock %}
+
+<!-- ===== AI Health Assistant Widget ===== -->
+<style>
+/* Floating button */
+#ai-chat-btn {
+    position: fixed;
+    bottom: 28px;
+    right: 28px;
+    width: 58px;
+    height: 58px;
+    border-radius: 50%;
+    background: var(--accent-strong);
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9998;
+    transition: transform 0.2s, background 0.2s;
+}
+#ai-chat-btn:hover { background: var(--accent); transform: scale(1.08); }
+
+/* Chat window */
+#ai-chat-window {
+    position: fixed;
+    bottom: 100px;
+    right: 28px;
+    width: 370px;
+    max-height: 560px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    display: none;
+    flex-direction: column;
+    box-shadow: 0 12px 48px rgba(0,0,0,0.5);
+    z-index: 9999;
+    overflow: hidden;
+}
+#ai-chat-window.open { display: flex; }
+
+/* Header */
+#ai-chat-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    background: var(--surface-alt);
+    border-bottom: 1px solid var(--border);
+}
+#ai-chat-header .ai-title {
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    font-weight: 650;
+    font-size: 0.97rem;
+    color: var(--text);
+}
+#ai-chat-header .ai-dot {
+    width: 9px; height: 9px;
+    background: var(--safe);
+    border-radius: 50%;
+    box-shadow: 0 0 6px var(--safe);
+}
+#ai-chat-close {
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 6px;
+}
+#ai-chat-close:hover { color: var(--text); background: var(--border); }
+
+/* Disclaimer */
+#ai-disclaimer {
+    padding: 8px 14px;
+    background: rgba(251,191,87,0.08);
+    border-bottom: 1px solid rgba(251,191,87,0.18);
+    font-size: 0.73rem;
+    color: var(--warning);
+    line-height: 1.45;
+}
+
+/* Messages */
+#ai-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 14px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    scroll-behavior: smooth;
+}
+.ai-msg {
+    max-width: 88%;
+    padding: 10px 13px;
+    border-radius: 14px;
+    font-size: 0.88rem;
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+.ai-msg.assistant {
+    align-self: flex-start;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-bottom-left-radius: 4px;
+}
+.ai-msg.user {
+    align-self: flex-end;
+    background: var(--accent-strong);
+    color: #04201c;
+    border-bottom-right-radius: 4px;
+}
+.ai-typing {
+    align-self: flex-start;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    border-bottom-left-radius: 4px;
+    padding: 10px 16px;
+    font-size: 0.85rem;
+    color: var(--muted);
+    display: none;
+    gap: 5px;
+    align-items: center;
+}
+.ai-typing.show { display: flex; }
+.ai-typing span {
+    width: 7px; height: 7px;
+    background: var(--muted);
+    border-radius: 50%;
+    animation: aiDot 1.2s infinite;
+}
+.ai-typing span:nth-child(2) { animation-delay: 0.2s; }
+.ai-typing span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes aiDot {
+    0%,60%,100% { opacity: 0.3; transform: translateY(0); }
+    30% { opacity: 1; transform: translateY(-4px); }
+}
+
+/* Input row */
+#ai-input-row {
+    display: flex;
+    gap: 8px;
+    padding: 12px 14px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+}
+#ai-input {
+    flex: 1;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 9px 12px;
+    color: var(--text);
+    font-size: 0.88rem;
+    outline: none;
+    resize: none;
+    font-family: inherit;
+    line-height: 1.4;
+}
+#ai-input:focus { border-color: var(--accent); }
+#ai-send {
+    background: var(--accent-strong);
+    border: none;
+    border-radius: 10px;
+    color: #04201c;
+    width: 38px;
+    min-width: 38px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 700;
+    transition: background 0.15s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+#ai-send:hover { background: var(--accent); }
+#ai-send:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* Suggestions */
+#ai-suggestions {
+    padding: 0 14px 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+.ai-suggestion {
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 11px;
+    font-size: 0.77rem;
+    color: var(--muted);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: border-color 0.15s, color 0.15s;
+}
+.ai-suggestion:hover { border-color: var(--accent); color: var(--accent); }
+</style>
+
+<!-- Floating button -->
+<button id="ai-chat-btn" title="Health AI Assistant">🤖</button>
+
+<!-- Chat window -->
+<div id="ai-chat-window">
+    <div id="ai-chat-header">
+        <div class="ai-title">
+            <span class="ai-dot"></span>
+            Health AI Assistant
+        </div>
+        <button id="ai-chat-close" title="Close">✕</button>
+    </div>
+    <div id="ai-disclaimer">
+        ⚠️ Educational information only. Not a substitute for professional medical advice, diagnosis, or treatment. Consult a qualified healthcare professional for medical concerns.
+    </div>
+    <div id="ai-messages">
+        <div class="ai-msg assistant">👋 Hello! I'm your Health AI Assistant. I can explain your prediction results, answer questions about heart disease and diabetes, and help you understand health parameters. How can I help you?</div>
+    </div>
+    <div id="ai-suggestions">
+        <span class="ai-suggestion">What does High Risk mean?</span>
+        <span class="ai-suggestion">What is BMI?</span>
+        <span class="ai-suggestion">How to improve heart health?</span>
+        <span class="ai-suggestion">What is cholesterol?</span>
+    </div>
+    <div class="ai-typing" id="ai-typing">
+        <span></span><span></span><span></span>
+    </div>
+    <div id="ai-input-row">
+        <textarea id="ai-input" rows="1" placeholder="Ask a health question…" maxlength="500"></textarea>
+        <button id="ai-send">➤</button>
+    </div>
+</div>
+
+<script>
+(function() {
+    const btn = document.getElementById('ai-chat-btn');
+    const win = document.getElementById('ai-chat-window');
+    const closeBtn = document.getElementById('ai-chat-close');
+    const messagesEl = document.getElementById('ai-messages');
+    const inputEl = document.getElementById('ai-input');
+    const sendBtn = document.getElementById('ai-send');
+    const typingEl = document.getElementById('ai-typing');
+    const suggestionsEl = document.getElementById('ai-suggestions');
+
+    // Conversation history for Gemini multi-turn
+    let history = [];
+    // Prediction context — auto-read from page if present
+    let predictionContext = null;
+
+    // Try to read prediction context injected by result page
+    if (window.__AI_PREDICTION_CONTEXT__) {
+        predictionContext = window.__AI_PREDICTION_CONTEXT__;
+    }
+
+    // Toggle open/close
+    btn.addEventListener('click', () => {
+        win.classList.toggle('open');
+        if (win.classList.contains('open')) inputEl.focus();
+    });
+    closeBtn.addEventListener('click', () => win.classList.remove('open'));
+
+    // Suggestion chips
+    suggestionsEl.addEventListener('click', (e) => {
+        if (e.target.classList.contains('ai-suggestion')) {
+            inputEl.value = e.target.textContent;
+            sendMessage();
+        }
+    });
+
+    // Send on Enter (Shift+Enter = newline)
+    inputEl.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+    sendBtn.addEventListener('click', sendMessage);
+
+    // Auto-resize textarea
+    inputEl.addEventListener('input', () => {
+        inputEl.style.height = 'auto';
+        inputEl.style.height = Math.min(inputEl.scrollHeight, 100) + 'px';
+    });
+
+    function appendMessage(role, text) {
+        // Hide suggestions after first user message
+        if (role === 'user') suggestionsEl.style.display = 'none';
+
+        const div = document.createElement('div');
+        div.className = 'ai-msg ' + role;
+        div.textContent = text;
+        messagesEl.appendChild(div);
+        messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    function setLoading(loading) {
+        sendBtn.disabled = loading;
+        inputEl.disabled = loading;
+        typingEl.classList.toggle('show', loading);
+        if (loading) messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+
+    async function sendMessage() {
+        const text = inputEl.value.trim();
+        if (!text) return;
+
+        inputEl.value = '';
+        inputEl.style.height = 'auto';
+        appendMessage('user', text);
+        setLoading(true);
+
+        try {
+            const body = {
+                message: text,
+                history: history,
+                prediction_context: predictionContext
+            };
+            const resp = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+
+            // FIX: check HTTP status BEFORE calling .json().
+            // Previously, any non-200 response (e.g. Flask 500 HTML error page,
+            // or a 302 redirect to /login when the session expired) would cause
+            // resp.json() to throw a SyntaxError, which was caught and shown as
+            // the misleading "Connection error. Please check your network."
+            // Now we surface the real HTTP status so the user sees a useful message.
+            if (resp.status === 401 || resp.status === 302 || resp.redirected) {
+                // Session expired — the @login_required decorator redirected to /login.
+                appendMessage('assistant', 'Your session has expired. Please refresh the page and log in again.');
+                setLoading(false);
+                return;
+            }
+            if (!resp.ok) {
+                // Server returned 4xx/5xx — try to parse JSON, fall back to status text
+                let errMsg = `Server error (HTTP ${resp.status}).`;
+                try {
+                    const errData = await resp.json();
+                    if (errData.reply) errMsg = errData.reply;
+                    else if (errData.error) errMsg = errData.error;
+                } catch (_) { /* response wasn't JSON — use the status message above */ }
+                appendMessage('assistant', errMsg + ' Check your server log for details.');
+                setLoading(false);
+                return;
+            }
+
+            const data = await resp.json();
+            const reply = data.reply || 'Sorry, I could not get a response. Please try again.';
+
+            // Store turns in history for Gemini multi-turn
+            history.push({ role: 'user', parts: [{ text: text }] });
+            history.push({ role: 'model', parts: [{ text: reply }] });
+
+            // Keep history bounded (last 10 turns = 5 pairs)
+            if (history.length > 20) history = history.slice(-20);
+
+            appendMessage('assistant', reply);
+        } catch (err) {
+            // Only genuine network failures reach here now (fetch() itself failed).
+            // e.g. the user is fully offline or the Flask server is not running.
+            console.error('AI chat fetch error:', err);
+            appendMessage('assistant', 'Network error: could not reach the server. Please check that Flask is running and you have an internet connection.');
+        } finally {
+            setLoading(false);
+            inputEl.focus();
+        }
+    }
+})();
+</script>
+</body>
+</html>

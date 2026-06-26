@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register — Disease Prediction System</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+<style>
+  .auth-wrapper {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg);
+    padding: 24px;
+  }
+  .auth-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    padding: 44px 40px 40px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.35);
+  }
+  .auth-brand {
+    text-align: center;
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: var(--text);
+    text-decoration: none;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .auth-brand span { color: var(--accent); }
+  .auth-subtitle {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 32px;
+  }
+  .auth-title {
+    text-align: center;
+    font-size: 1.45rem;
+    font-weight: 650;
+    margin: 0 0 24px;
+  }
+  .form-group { margin-bottom: 18px; }
+  .form-group label {
+    display: block;
+    font-size: 0.87rem;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .form-group input {
+    width: 100%;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    padding: 11px 14px;
+    color: var(--text);
+    font-size: 0.97rem;
+    outline: none;
+    transition: border-color 0.15s;
+    box-sizing: border-box;
+  }
+  .form-group input:focus { border-color: var(--accent); }
+  .auth-error {
+    background: rgba(248,113,113,0.12);
+    border: 1px solid rgba(248,113,113,0.3);
+    border-radius: 9px;
+    color: var(--danger);
+    padding: 11px 14px;
+    font-size: 0.9rem;
+    margin-bottom: 18px;
+  }
+  .btn-auth {
+    width: 100%;
+    background: var(--accent-strong);
+    color: #04201c;
+    border: none;
+    padding: 13px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 650;
+    cursor: pointer;
+    margin-top: 6px;
+    transition: background 0.15s;
+  }
+  .btn-auth:hover { background: var(--accent); }
+  .auth-footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.88rem;
+    margin-top: 22px;
+  }
+  .auth-footer a { color: var(--accent); text-decoration: none; font-weight: 600; }
+  .auth-footer a:hover { text-decoration: underline; }
+  .hint {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+</style>
+</head>
+<body>
+<div class="auth-wrapper">
+  <div class="auth-card">
+    <a href="#" class="auth-brand">🩺 Disease<span>Predict</span></a>
+    <p class="auth-subtitle">Clinical Decision Support System</p>
+    <h1 class="auth-title">Create Account</h1>
+
+    {% if error %}
+    <div class="auth-error">{{ error }}</div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('auth.register') }}">
+      <div class="form-group">
+        <label for="full_name">Full Name</label>
+        <input type="text" id="full_name" name="full_name" placeholder="Dr. Jane Smith" required
+               value="{{ request.form.get('full_name', '') }}" autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" placeholder="you@example.com" required
+               value="{{ request.form.get('email', '') }}" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="••••••••" required
+               autocomplete="new-password" minlength="6">
+        <p class="hint">Minimum 6 characters</p>
+      </div>
+      <div class="form-group">
+        <label for="confirm_password">Confirm Password</label>
+        <input type="password" id="confirm_password" name="confirm_password" placeholder="••••••••" required
+               autocomplete="new-password">
+      </div>
+      <button type="submit" class="btn-auth">Create Account →</button>
+    </form>
+
+    <p class="auth-footer">
+      Already have an account? <a href="{{ url_for('auth.login') }}">Sign in</a>
+    </p>
+  </div>
+</div>
+</body>
+</html>

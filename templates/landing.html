@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Disease Prediction System — Home{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <h1>Heart Disease & Diabetes Risk Assessment</h1>
+    <p class="hero-sub">
+        A clinical decision-support tool that estimates the likelihood of
+        Heart Disease or Diabetes from patient data — built on real medical
+        datasets, with multiple model comparison and explainable results.
+    </p>
+    <a href="{{ url_for('select_disease') }}" class="btn-primary">Start Prediction →</a>
+</section>
+
+<section class="features-grid">
+    <div class="feature-card">
+        <div class="feature-icon">🫀</div>
+        <h3>Heart Disease</h3>
+        <p>13 clinical features including blood pressure, cholesterol, and ECG results.</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">🩸</div>
+        <h3>Diabetes</h3>
+        <p>8 features including glucose level, BMI, and family history score.</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">🧠</div>
+        <h3>Explainable AI</h3>
+        <p>See exactly which factors drove each prediction, in plain language.</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">📄</div>
+        <h3>PDF Reports</h3>
+        <p>Download a complete prediction report for any patient record.</p>
+    </div>
+</section>
+
+<section class="how-it-works">
+    <h2>How It Works</h2>
+    <ol class="steps">
+        <li>Select a disease (Heart Disease or Diabetes)</li>
+        <li>Enter the patient's clinical values</li>
+        <li>The best-performing trained model (chosen automatically from 4 candidates) generates a prediction</li>
+        <li>View the risk score, probability, top contributing factors, and download a PDF report</li>
+    </ol>
+</section>
+{% endblock %}

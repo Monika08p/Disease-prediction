@@ -1,0 +1,321 @@
+/* ===== Theme variables ===== */
+:root[data-theme="dark"] {
+    --bg: #0a1628;
+    --surface: #0f2138;
+    --surface-alt: #122844;
+    --border: #1e3a5c;
+    --text: #e8eef5;
+    --muted: #8fa3bd;
+    --accent: #2dd4bf;
+    --accent-strong: #14b8a6;
+    --accent-soft: rgba(45,212,191,0.12);
+    --danger: #f87171;
+    --warning: #fbbf57;
+    --safe: #34d399;
+}
+:root[data-theme="light"] {
+    --bg: #f3f7fa;
+    --surface: #ffffff;
+    --surface-alt: #f7fafc;
+    --border: #dce5ec;
+    --text: #102a43;
+    --muted: #5b7186;
+    --accent: #0d9488;
+    --accent-strong: #0f766e;
+    --accent-soft: rgba(13,148,136,0.1);
+    --danger: #dc2626;
+    --warning: #b45309;
+    --safe: #15803d;
+}
+
+* { box-sizing: border-box; }
+body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: "Segoe UI", -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.55;
+    transition: background 0.2s, color 0.2s;
+    letter-spacing: 0.1px;
+}
+h1, h2, h3 { letter-spacing: -0.01em; font-weight: 650; }
+
+/* ===== Navbar ===== */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 36px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+}
+.brand { font-weight: 700; font-size: 1.25rem; color: var(--text); text-decoration: none; }
+.brand span { color: var(--accent); }
+.nav-links { display: flex; align-items: center; gap: 24px; }
+.nav-links a { color: var(--muted); text-decoration: none; font-size: 0.95rem; font-weight: 500; }
+.nav-links a:hover { color: var(--accent); }
+.theme-toggle {
+    background: var(--accent-soft);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 7px 11px;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+/* ===== Layout ===== */
+.container { max-width: 1120px; margin: 0 auto; padding: 48px 24px; }
+.footer { text-align: center; color: var(--muted); font-size: 0.82rem; padding: 28px; border-top: 1px solid var(--border); }
+
+/* ===== Hero ===== */
+.hero { text-align: center; padding: 48px 0 56px; }
+.hero h1 { font-size: 2.3rem; margin-bottom: 14px; }
+.hero-sub { color: var(--muted); max-width: 620px; margin: 0 auto 28px; font-size: 1.02rem; }
+
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--accent-strong);
+    color: #04201c;
+    border: none;
+    padding: 13px 26px;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 650;
+    text-decoration: none;
+    cursor: pointer;
+}
+.btn-primary:hover { background: var(--accent); }
+.btn-secondary {
+    margin-top: 18px;
+    background: transparent;
+    border: 1.5px solid var(--accent);
+    color: var(--accent);
+    padding: 11px 20px;
+    border-radius: 9px;
+    cursor: pointer;
+    font-weight: 600;
+}
+.btn-secondary:hover { background: var(--accent-soft); }
+
+/* ===== Feature grid ===== */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin: 48px 0;
+}
+.feature-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 24px 20px;
+    text-align: center;
+}
+.feature-icon { font-size: 2rem; margin-bottom: 10px; }
+.feature-card h3 { margin: 4px 0 8px; font-size: 1.02rem; }
+.feature-card p { color: var(--muted); font-size: 0.88rem; margin: 0; }
+
+.how-it-works { margin: 48px 0; }
+.how-it-works h2 { font-size: 1.4rem; margin-bottom: 16px; }
+.steps { color: var(--muted); line-height: 2; padding-left: 20px; }
+
+/* ===== Disease selection ===== */
+.select-page { text-align: center; }
+.disease-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-top: 32px;
+}
+.disease-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 32px;
+    text-decoration: none;
+    color: var(--text);
+    transition: transform 0.15s, border-color 0.15s;
+}
+.disease-card:hover { transform: translateY(-4px); border-color: var(--accent); }
+.disease-icon { font-size: 3rem; }
+.disease-card p { color: var(--muted); }
+.disease-link { color: var(--accent); font-weight: 600; }
+
+/* ===== Predict page ===== */
+.predict-layout {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    gap: 24px;
+    align-items: start;
+}
+@media (max-width: 900px) {
+    .predict-layout { grid-template-columns: 1fr; }
+    .features-grid { grid-template-columns: 1fr 1fr; }
+    .disease-cards { grid-template-columns: 1fr; }
+}
+.card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 30px;
+}
+.form-section { margin-bottom: 28px; }
+.form-section:last-of-type { margin-bottom: 0; }
+.form-section-title {
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--accent);
+    margin: 0 0 16px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+}
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+.form-group label { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 6px; font-weight: 500; }
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 11px 13px;
+    background: var(--surface-alt);
+    border: 1px solid var(--border);
+    border-radius: 9px;
+    color: var(--text);
+    font-size: 0.95rem;
+    font-family: inherit;
+}
+.form-group input:focus,
+.form-group select:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-soft); }
+.form-group select { cursor: pointer; }
+
+.patient-name-display { color: var(--muted); margin-top: -6px; margin-bottom: 18px; font-size: 0.92rem; }
+
+.form-card-single { max-width: 760px; margin: 0 auto; }
+#predict-btn { margin-top: 24px; width: 100%; justify-content: center; }
+
+/* ===== Result / Report page ===== */
+.report-header { text-align: center; margin-bottom: 28px; }
+.report-header h1 { font-size: 1.9rem; margin-bottom: 6px; }
+.report { max-width: 820px; margin: 0 auto; padding: 36px; }
+.report-section { margin-bottom: 32px; padding-bottom: 28px; border-bottom: 1px solid var(--border); }
+.report-section:last-of-type { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+
+.info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+}
+.info-item { display: flex; flex-direction: column; gap: 4px; }
+.info-label { font-size: 0.78rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.info-value { font-size: 1.02rem; font-weight: 600; }
+
+.result-detail-grid {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: 24px;
+    align-items: center;
+    margin-top: 18px;
+}
+@media (max-width: 700px) {
+    .result-detail-grid { grid-template-columns: 1fr; }
+    .info-grid { grid-template-columns: 1fr; }
+}
+.result-meta p { margin: 6px 0; }
+
+.report-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 8px;
+}
+.inline-form { margin: 0; }
+.report-actions .btn-primary,
+.report-actions .btn-secondary { margin-top: 0; }
+.spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.4);
+    border-top-color: white;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+}
+.spinner.hidden { display: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ===== Alerts ===== */
+.alert { margin-top: 16px; padding: 12px 16px; border-radius: 8px; font-size: 0.9rem; }
+.alert-error { background: rgba(255,95,109,0.12); border: 1px solid var(--danger); color: var(--danger); }
+.alert-warning { background: rgba(255,196,77,0.12); border: 1px solid var(--warning); color: var(--warning); }
+
+/* ===== Result card ===== */
+.result-banner { padding: 16px; border-radius: 10px; text-align: center; margin-bottom: 16px; }
+.result-banner .verdict { font-size: 1.1rem; font-weight: 700; }
+.risk-badge {
+    display: inline-block;
+    margin-top: 6px;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+.risk-low { background: rgba(61,220,132,0.12); border: 1px solid var(--safe); }
+.risk-low .risk-badge { background: rgba(61,220,132,0.2); color: var(--safe); }
+.risk-medium { background: rgba(255,196,77,0.12); border: 1px solid var(--warning); }
+.risk-medium .risk-badge { background: rgba(255,196,77,0.2); color: var(--warning); }
+.risk-high { background: rgba(255,95,109,0.12); border: 1px solid var(--danger); }
+.risk-high .risk-badge { background: rgba(255,95,109,0.2); color: var(--danger); }
+
+.gauge-wrap { position: relative; width: 220px; margin: 16px auto; text-align: center; }
+.gauge-value {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.6rem;
+    font-weight: 700;
+}
+.gauge-caption { text-align: center; color: var(--muted); font-size: 0.85rem; }
+.model-used { text-align: center; color: var(--muted); font-size: 0.85rem; }
+.explanation { color: var(--text); line-height: 1.6; font-size: 0.92rem; }
+
+/* ===== History ===== */
+.history-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+.history-table th, .history-table td {
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.9rem;
+}
+.badge { padding: 3px 10px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+.badge.low { background: rgba(61,220,132,0.15); color: var(--safe); }
+.badge.medium { background: rgba(255,196,77,0.15); color: var(--warning); }
+.badge.high { background: rgba(255,95,109,0.15); color: var(--danger); }
+
+/* ===== Error page ===== */
+.error-page { text-align: center; padding: 80px 0; }
+.error-page h1 { font-size: 4rem; color: var(--accent); }
+
+/* ===== Auth — Navbar additions ===== */
+.nav-user {
+    color: var(--muted);
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+.btn-logout {
+    background: transparent;
+    border: 1.5px solid var(--border);
+    color: var(--muted);
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+}
+.btn-logout:hover {
+    border-color: var(--danger);
+    color: var(--danger);
+}

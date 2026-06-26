@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}{{ disease_label }} Prediction{% endblock %}
+
+{% block content %}
+<section class="predict-page">
+    <h1>{{ '🫀' if disease == 'heart' else '🩸' }} {{ disease_label }} Risk Assessment</h1>
+    <p class="hero-sub">Enter the patient's details and clinical values below.</p>
+
+    <div class="card form-card form-card-single">
+        <form method="POST" id="predict-form">
+
+            <div class="form-section">
+                <h3 class="form-section-title">Patient Information</h3>
+                <div class="grid">
+                    <div class="form-group">
+                        <label for="patient_name">Patient Name</label>
+                        <input type="text" name="patient_name" id="patient_name" required
+                               placeholder="e.g. Monika P"
+                               value="{{ form_values.get('patient_name', '') }}">
+                    </div>
+
+                    {% for field in fields %}
+                    {% if field == 'age' %}
+                    <div class="form-group">
+                        <label for="age">{{ labels.get('age', 'Age') }}</label>
+                        <input type="number" step="any" name="age" id="age" required
+                               min="{{ ranges['age'][0] if 'age' in ranges else '' }}"
+                               max="{{ ranges['age'][1] if 'age' in ranges else '' }}"
+                               value="{{ form_values.get('age', '') }}">
+                    </div>
+                    {% elif field == 'sex' %}
+                    <div class="form-group">
+                        <label for="sex">Gender</label>
+                        <select name="sex" id="sex" required>
+                            <option value="" disabled {% if not form_values.get('sex') %}selected{% endif %}>Select...</option>
+                            <option value="1" {% if form_values.get('sex') == '1' %}selected{% endif %}>Male</option>
+                            <option value="0" {% if form_values.get('sex') == '0' %}selected{% endif %}>Female</option>
+                        </select>
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3 class="form-section-title">Clinical Parameters</h3>
+                <div class="grid">
+                    {% for field in fields %}
+                    {% if field not in ('age', 'sex') %}
+                    <div class="form-group">
+                        <label for="{{ field }}">{{ labels.get(field, field) }}</label>
+                        <input type="number" step="any" name="{{ field }}" id="{{ field }}" required
+                               min="{{ ranges[field][0] if field in ranges else '' }}"
+                               max="{{ ranges[field][1] if field in ranges else '' }}"
+                               value="{{ form_values.get(field, '') }}">
+                    </div>
+                    {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+
+            <button type="submit" class="btn-primary" id="predict-btn">
+                <span id="btn-text">Predict</span>
+                <span id="btn-spinner" class="spinner hidden"></span>
+            </button>
+        </form>
+
+        {% if error %}
+        <div class="alert alert-error">⚠ {{ error }}</div>
+        {% endif %}
+
+        {% if warnings %}
+        <div class="alert alert-warning">
+            <strong>Note:</strong> some values are outside typical clinical ranges:
+            <ul>{% for w in warnings %}<li>{{ w }}</li>{% endfor %}</ul>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
